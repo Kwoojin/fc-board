@@ -1,0 +1,63 @@
+# spring debug level 비활성화 (너무 많음)
+debug: false
+#Actuator 에 endpoint 중 감춰져 있는 부분을 모두 활성화 시킴
+management.endpoints.web.exposure.include: "*"
+
+#package 단위 log 활성화
+logging:
+  level:
+    com.fc.board: debug
+    #request, response log
+    org.springframework.web.servlet: debug
+    #jpa query log debug 중 binding query parameter ? 으로 나타나는 것을 관찰할 수 있게함
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/board
+    username: user
+    password: user
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    open-in-view: false
+    #test용 database data 활성화( data.sql 통해 초기값 세팅 가능)
+    defer-datasource-initialization: true
+    #Entity를 통해 ddl 자동 생성
+    hibernate.ddl-auto: create
+    #sql 로그
+    show-sql: true
+    properties:
+      #한 줄로 나타는 query formatting 하여 표현
+      hibernate.format_sql: true
+      #jpa batch query 사이즈
+      hibernate.default_batch_fetch_size: 100
+  # never, always, embedded
+  sql.init.mode: always
+#  data.rest:
+#    base-path: /api
+#    detection-strategy: annotated
+#  thymeleaf3.decoupled-logic: true
+#  h2.console.enabled: false
+
+#?  3?? ???? ???? document ?? ??
+---
+
+spring:
+  #profile
+  config.activate.on-profile: testdb
+  datasource:
+    url: jdbc:h2:mem:board;mode=mysql
+    driver-class-name: org.h2.Driver
+  sql.init.mode: always
+  #https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#appendix.application-properties.testing
+  test.database.replace: none
+
+---
+
+spring:
+  config.activate.on-profile: heroku
+  datasource:
+    url: ${JAWSDB_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa.hibernate.ddl-auto: create
+  sql.init.mode: always
