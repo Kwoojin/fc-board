@@ -1,10 +1,11 @@
 package com.fc.board.service;
 
 import com.fc.board.domain.Article;
+import com.fc.board.domain.ArticleComment;
+import com.fc.board.domain.UserAccount;
 import com.fc.board.dto.ArticleCommentDto;
 import com.fc.board.repository.ArticleCommentRepository;
 import com.fc.board.repository.ArticleRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,10 +13,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -33,9 +36,10 @@ class ArticleCommentServiceTest {
     void givenArticleId_whenSearchingArticleComments_thenReturnsArticleComments() {
         //given
         Long articleId = 1L;
+        UserAccount userAccount = UserAccount.of("woojin", "pw", null, null, null);
 
         given(articleRepository.findById(articleId)).willReturn(Optional.of(
-                Article.of("title", "content", "#hashtag"))
+                Article.of(userAccount, "title", "content", "#hashtag"))
         );
 
         //when
@@ -46,22 +50,17 @@ class ArticleCommentServiceTest {
         then(articleRepository).should().findById(articleId);
     }
 
-    @DisplayName("댓글 정보를 입력하면, 댓글 저장한다.")
+    @DisplayName("댓글 정보를 입력하면, 댓글을 저장한다.")
     @Test
-    void givenArticleCommentInfo_whenSavingArticleComment_SaveArticleComment() {
-        //given
-        Long articleId = 1L;
+    void givenArticleCommentInfo_whenSavingArticleComment_thenSavesArticleComment() {
+        // Given
+        given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(null);
 
-        given(articleRepository.findById(articleId)).willReturn(Optional.of(
-                Article.of("title", "content", "#hashtag"))
-        );
+        // When
+        sut.saveArticleComment(ArticleCommentDto.of(LocalDateTime.now(), "Uno", LocalDateTime.now(), "Uno", "comment"));
 
-        //when
-        List<ArticleCommentDto> articleComments = sut.searchArticleComment(articleId);
-
-        //then
-        assertThat(articleComments).isNotNull();
-        then(articleRepository).should().findById(articleId);
+        // Then
+        then(articleCommentRepository).should().save(any(ArticleComment.class));
     }
 
 }
