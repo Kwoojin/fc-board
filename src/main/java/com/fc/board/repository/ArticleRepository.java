@@ -18,7 +18,15 @@ public interface ArticleRepository extends
         QuerydslPredicateExecutor<Article>,
         QuerydslBinderCustomizer<QArticle> {
 
-    Page<Article> findByTitle(String title, Pageable pageable);
+    Page<Article> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    Page<Article> findByContentContainingIgnoreCase(String content, Pageable pageable);
+
+    Page<Article> findByUserAccount_UserIdContainingIgnoreCase(String userId, Pageable pageable);
+
+    Page<Article> findByUserAccount_NicknameContainingIgnoreCase(String nickname, Pageable pageable);
+
+    Page<Article> findByHashtag(String hashtag, Pageable pageable);
 
     @Override
     default void customize(QuerydslBindings bindings, QArticle root) {
