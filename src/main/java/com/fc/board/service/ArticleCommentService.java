@@ -1,9 +1,12 @@
 package com.fc.board.service;
 
+import com.fc.board.domain.Article;
 import com.fc.board.domain.ArticleComment;
+import com.fc.board.domain.UserAccount;
 import com.fc.board.dto.ArticleCommentDto;
 import com.fc.board.repository.ArticleCommentRepository;
 import com.fc.board.repository.ArticleRepository;
+import com.fc.board.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,9 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class ArticleCommentService {
 
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
     public List<ArticleCommentDto> searchArticleComments(Long articleId) {
@@ -34,9 +37,11 @@ public class ArticleCommentService {
 
     public void saveArticleComment(ArticleCommentDto dto) {
         try {
-            articleCommentRepository.save(dto.toEntity(articleRepository.getReferenceById(dto.getArticleId())));
+            Article article = articleRepository.getReferenceById(dto.getArticleId());
+            UserAccount userAccount = userAccountRepository.getReferenceById(dto.getUserAccountDto().getUserId());
+            articleCommentRepository.save(dto.toEntity(article, userAccount));
         } catch (EntityNotFoundException e) {
-            log.warn("댓글 저장 실패. 댓글의 게시글을 찾을 수 없습니다 - dto: {}", dto);
+            log.warn("댓글 저장 실패. 댓글 작성에 필요한 정보를 찾을 수 없습니다 - dto: {}", e.getLocalizedMessage());
         }
     }
 
