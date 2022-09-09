@@ -1,6 +1,5 @@
 package com.fc.board.controller;
 
-import com.fc.board.config.SecurityConfig;
 import com.fc.board.config.TestSecurityConfig;
 import com.fc.board.domain.constant.FormStatus;
 import com.fc.board.domain.constant.SearchType;
