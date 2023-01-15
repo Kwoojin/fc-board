@@ -18,6 +18,7 @@ spring:
 #    username: sa
 #    driver-class-name: org.h2.Driver
     url: jdbc:mysql://localhost:3306/board
+
     username: user
     password: user
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -33,7 +34,8 @@ spring:
       #한 줄로 나타는 query formatting 하여 표현
       hibernate.format_sql: true
       #jpa batch query 사이즈
-      hibernate.default_batch_fetch_size: 100
+      hibernate:
+        default_batch_fetch_size: 100
   # never, always, embedded
   sql.init.mode: always
   data.rest:
@@ -41,6 +43,26 @@ spring:
     detection-strategy: annotated
   thymeleaf3.decoupled-logic: true
 #  h2.console.enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: id
+            client-secret: key
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/kakao"
+            client-authentication-method: POST
+        provider:
+          kakao:
+            # 권한을 확인하는 URI
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            # Token 을 갱신할 때 사용하는 URI
+            token-uri: https://kauth.kakao.com/oauth/token
+            # DB에 저장하지 않고 OAUTH 서버에 있는 데이터를 이용하고자 할 때 사용
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            # api 에서 username 을 확인하기 위해 사용할 수 있는 식별자
+            user-name-attribute: id
 
 #?  3?? ???? ???? document ?? ??
 ---
@@ -64,4 +86,3 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa.hibernate.ddl-auto: create
   sql.init.mode: always
-  
