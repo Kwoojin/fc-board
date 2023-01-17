@@ -16,7 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
 import java.util.List;
+
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,15 +38,19 @@ public class ArticleService {
 
         switch (searchType) {
             case TITLE :
-                return articleRepository.findByTitleContainingIgnoreCase(searchKeyword, pageable).map(ArticleDto::from);
+                return articleRepository.findByTitleContaining(searchKeyword, pageable).map(ArticleDto::from);
             case CONTENT :
-                return articleRepository.findByContentContainingIgnoreCase(searchKeyword, pageable).map(ArticleDto::from);
+                return articleRepository.findByContentContaining(searchKeyword, pageable).map(ArticleDto::from);
             case ID :
-                return articleRepository.findByUserAccount_UserIdContainingIgnoreCase(searchKeyword, pageable).map(ArticleDto::from);
+                return articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDto::from);
             case NICKNAME :
-                return articleRepository.findByUserAccount_NicknameContainingIgnoreCase(searchKeyword, pageable).map(ArticleDto::from);
+                return articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDto::from);
             case HASHTAG :
-                return articleRepository.findByHashtag("#" + searchKeyword, pageable).map(ArticleDto::from);
+                return articleRepository.findByHashtagNames(
+                                Arrays.stream(searchKeyword.split(" ")).collect(toList()),
+                                pageable
+                        )
+                        .map(ArticleDto::from);
         }
         return Page.empty();
     }
@@ -75,7 +82,6 @@ public class ArticleService {
             if (article.getUserAccount().equals(userAccount)) {
                 if (StringUtils.hasText(dto.getTitle())) { article.setTitle(dto.getTitle()); }
                 if (StringUtils.hasText(dto.getContent())) { article.setContent(dto.getContent()); }
-                article.setHashtag(dto.getHashtag());
             }
         } catch (EntityNotFoundException e) {
             log.warn("게시글 업데이트 실패. 게시글을 수정하는데 필요한 정보를 찾을 수 없습니다 - {}", e.getLocalizedMessage());
@@ -96,7 +102,7 @@ public class ArticleService {
             return Page.empty(pageable);
         }
 
-        return articleRepository.findByHashtag(hashtag, pageable).map(ArticleDto::from);
+        return articleRepository.findByHashtagNames(null, pageable).map(ArticleDto::from);
     }
 
     @Transactional(readOnly = true)
