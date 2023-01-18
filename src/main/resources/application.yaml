@@ -17,10 +17,10 @@ spring:
 #    url: jdbc:h2:mem:testdb
 #    username: sa
 #    driver-class-name: org.h2.Driver
-    url: jdbc:mysql://localhost:3306/board
-    username: user
-    password: user
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://localhost:5432/board
+    username: postgres
+    password: root
+#    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     open-in-view: false
     #test용 database data 활성화( data.sql 통해 초기값 세팅 가능)
@@ -64,4 +64,3 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa.hibernate.ddl-auto: create
   sql.init.mode: always
-  
