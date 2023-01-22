@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
@@ -55,5 +56,18 @@ public class ArticleDto {
                 title,
                 content
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ArticleDto)) return false;
+        ArticleDto dto = (ArticleDto) o;
+        return Objects.equals(getId(), dto.getId()) && Objects.equals(getUserAccountDto(), dto.getUserAccountDto()) && Objects.equals(getTitle(), dto.getTitle()) && Objects.equals(getContent(), dto.getContent()) && Objects.equals(getHashtagDtos(), dto.getHashtagDtos()) && Objects.equals(getCreatedAt(), dto.getCreatedAt()) && Objects.equals(getCreatedBy(), dto.getCreatedBy()) && Objects.equals(getModifiedAt(), dto.getModifiedAt()) && Objects.equals(getModifiedBy(), dto.getModifiedBy());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUserAccountDto(), getTitle(), getContent(), getHashtagDtos(), getCreatedAt(), getCreatedBy(), getModifiedAt(), getModifiedBy());
     }
 }

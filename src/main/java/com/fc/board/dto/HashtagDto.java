@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,4 +42,16 @@ public class HashtagDto {
         return Hashtag.of(getHashtagName());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HashtagDto)) return false;
+        HashtagDto that = (HashtagDto) o;
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getHashtagName(), that.getHashtagName()) && Objects.equals(getCreatedAt(), that.getCreatedAt()) && Objects.equals(getCreatedBy(), that.getCreatedBy()) && Objects.equals(getModifiedAt(), that.getModifiedAt()) && Objects.equals(getModifiedBy(), that.getModifiedBy());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getHashtagName(), getCreatedAt(), getCreatedBy(), getModifiedAt(), getModifiedBy());
+    }
 }
