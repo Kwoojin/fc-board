@@ -7,15 +7,17 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class BoardPrincipal implements UserDetails {
+public class BoardPrincipal implements UserDetails, OAuth2User {
 
     private final String username;
     private final String password;
@@ -23,8 +25,13 @@ public class BoardPrincipal implements UserDetails {
     private final String email;
     private final String nickname;
     private final String memo;
+    private final Map<String, Object> oAuth2Attributes;
 
     public static BoardPrincipal of(String username, String password, String email, String nickname, String memo) {
+        return of(username, password, email, nickname, memo, Map.of());
+    }
+
+    public static BoardPrincipal of(String username, String password, String email, String nickname, String memo, Map<String, Object> oAuth2Attributes) {
         Set<RoleType> roleTypes = Set.of(RoleType.USER);
 
         return new BoardPrincipal(
@@ -36,7 +43,8 @@ public class BoardPrincipal implements UserDetails {
                         .collect(Collectors.toUnmodifiableSet()),
                 email,
                 nickname,
-                memo
+                memo,
+                oAuth2Attributes
         );
     }
 
@@ -68,6 +76,9 @@ public class BoardPrincipal implements UserDetails {
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled() { return true; }
+
+    @Override public Map<String, Object> getAttributes() { return oAuth2Attributes; }
+    @Override public String getName() { return username; }
 
     @Override
     public boolean equals(Object o) {
