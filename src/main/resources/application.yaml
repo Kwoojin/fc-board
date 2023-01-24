@@ -17,9 +17,9 @@ spring:
 #    url: jdbc:h2:mem:testdb
 #    username: sa
 #    driver-class-name: org.h2.Driver
-    url: jdbc:postgresql://localhost:5432/board
-    username: postgres
-    password: root
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
 #    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     open-in-view: false
