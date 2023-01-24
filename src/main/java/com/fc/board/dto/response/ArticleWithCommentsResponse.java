@@ -1,5 +1,6 @@
 package com.fc.board.dto.response;
 
+import com.fc.board.dto.ArticleCommentDto;
 import com.fc.board.dto.ArticleWithCommentsDto;
 import com.fc.board.dto.HashtagDto;
 import lombok.AccessLevel;
@@ -7,9 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.TreeSet;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
 
@@ -44,14 +47,37 @@ public class ArticleWithCommentsResponse {
                 dto.getContent(),
                 dto.getHashtagDtos().stream()
                         .map(HashtagDto::getHashtagName)
-                        .collect(toUnmodifiableSet()),
+                        .collect(toUnmodifiableSet())
+                ,
                 dto.getCreatedAt(),
                 dto.getUserAccountDto().getEmail(),
                 nickname,
                 dto.getUserAccountDto().getUserId(),
-                dto.getArticleCommentDtos().stream()
-                        .map(ArticleCommentResponse::from)
-                        .collect(toCollection(LinkedHashSet::new))
+                organizeChildComments(dto.getArticleCommentDtos())
         );
+    }
+
+
+    private static Set<ArticleCommentResponse> organizeChildComments(Set<ArticleCommentDto> dtos) {
+        Map<Long, ArticleCommentResponse> map = dtos.stream()
+                .map(ArticleCommentResponse::from)
+                .collect(toMap(ArticleCommentResponse::getId, Function.identity()));
+
+        map.values().stream()
+                .filter(ArticleCommentResponse::hasParentComment)
+                .forEach(comment -> {
+                    ArticleCommentResponse parentComment = map.get(comment.getParentCommentId());
+                    parentComment.getChildComments().add(comment);
+                });
+
+        return map.values().stream()
+                .filter(comment -> !comment.hasParentComment())
+                .collect(toCollection(() ->
+                        new TreeSet<>(Comparator
+                                .comparing(ArticleCommentResponse::getCreatedAt)
+                                .reversed()
+                                .thenComparingLong(ArticleCommentResponse::getId)
+                        )
+                ));
     }
 }
