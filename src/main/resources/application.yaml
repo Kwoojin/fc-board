@@ -13,6 +13,12 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 
 spring:
+  application.name: board
+  cloud.vault:
+    scheme: http
+    authentication: TOKEN
+    token: ${VAULT_TOKEN}
+  config.import: vault://
   datasource:
 #    url: jdbc:h2:mem:testdb
 #    username: sa
