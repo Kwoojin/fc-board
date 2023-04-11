@@ -50,6 +50,9 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/kakao"
             client-authentication-method: POST
+          facebook:
+            client-id: 3508363126109155
+            client-secret: 14f5bf4ae82bef29f0a378c2d551aa56
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
