@@ -1,9 +1,7 @@
 package com.fc.board.config;
 
-import com.fc.board.dto.UserAccountDto;
 import com.fc.board.dto.security.BoardPrincipal;
 import com.fc.board.dto.security.KakaoOAuth2Response;
-import com.fc.board.repository.UserAccountRepository;
 import com.fc.board.service.UserAccountService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +12,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -31,7 +32,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService
+            OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService,
+            OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService
     ) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
@@ -40,7 +42,9 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/",
                                 "/articles",
-                                "/articles/search-hashtag"
+                                "/articles/search-hashtag",
+                                "/management/health",
+                                "/management/prometheus"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -49,6 +53,7 @@ public class SecurityConfig {
                 .oauth2Login(oAuth -> oAuth
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2UserService)
+                                .oidcUserService(oidcUserService)
                         )
                 )
                 .build();
@@ -105,6 +110,17 @@ public class SecurityConfig {
                     );
         };
 
+    }
+
+    @Bean
+    public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+        OidcUserService oidcUserService = new OidcUserService();
+
+        return userRequest -> {
+            OidcUser oidcUser = oidcUserService.loadUser(userRequest);
+
+            return oidcUser;
+        };
     }
 
     @Bean
