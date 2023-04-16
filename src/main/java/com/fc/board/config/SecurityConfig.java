@@ -43,8 +43,8 @@ public class SecurityConfig {
                                 "/",
                                 "/articles",
                                 "/articles/search-hashtag",
-                                "/management/health",
-                                "/management/prometheus"
+                                "/management/**"
+//                                "/management/prometheus"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
