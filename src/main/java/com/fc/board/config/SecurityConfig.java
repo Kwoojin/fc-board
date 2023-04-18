@@ -1,6 +1,7 @@
 package com.fc.board.config;
 
 import com.fc.board.dto.security.BoardPrincipal;
+import com.fc.board.dto.security.CommonOAuth2Response;
 import com.fc.board.dto.security.KakaoOAuth2Response;
 import com.fc.board.service.UserAccountService;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -89,9 +90,10 @@ public class SecurityConfig {
         return userRequest -> {
             OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-            KakaoOAuth2Response kakaoResponse = KakaoOAuth2Response.from(oAuth2User.getAttributes());
             String registrationId = userRequest.getClientRegistration().getRegistrationId();
-            String providerId = String.valueOf(kakaoResponse.getId());
+            CommonOAuth2Response response = CommonOAuth2Response.getProvider(registrationId).convert(oAuth2User.getAttributes());
+
+            String providerId = String.valueOf(response.getId());
             String username = registrationId + "_" + providerId;
             String dummyPassword = passwordEncoder.encode("{bcrypt}" + UUID.randomUUID());
 
@@ -102,8 +104,8 @@ public class SecurityConfig {
                                     userAccountService.saveUser(
                                             username,
                                             dummyPassword,
-                                            kakaoResponse.getEmail(),
-                                            kakaoResponse.getNickname(),
+                                            response.getEmail(),
+                                            response.getNickname(),
                                             null
                                     )
                             )
