@@ -115,13 +115,36 @@ public class SecurityConfig {
     }
 
     @Bean
-    public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+    public OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService(
+            UserAccountService userAccountService,
+            PasswordEncoder passwordEncoder
+    ) {
         OidcUserService oidcUserService = new OidcUserService();
 
         return userRequest -> {
             OidcUser oidcUser = oidcUserService.loadUser(userRequest);
 
-            return oidcUser;
+            String registrationId = userRequest.getClientRegistration().getRegistrationId();
+            CommonOAuth2Response response = CommonOAuth2Response.getProvider(registrationId).convert(oidcUser.getAttributes());
+
+            String providerId = String.valueOf(response.getId());
+            String username = registrationId + "_" + providerId;
+            String dummyPassword = passwordEncoder.encode("{bcrypt}" + UUID.randomUUID());
+
+            // TODO : 수정
+            return userAccountService.searchUser(username)
+                    .map(BoardPrincipal::from)
+                    .orElseGet(() ->
+                            BoardPrincipal.from(
+                                    userAccountService.saveUser(
+                                            username,
+                                            dummyPassword,
+                                            response.getEmail(),
+                                            response.getNickname(),
+                                            null
+                                    )
+                            )
+                    );
         };
     }
 
