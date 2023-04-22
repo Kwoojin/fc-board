@@ -7,6 +7,9 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
@@ -17,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class BoardPrincipal implements UserDetails, OAuth2User {
+public class BoardPrincipal implements UserDetails, OAuth2User, OidcUser {
 
     private final String username;
     private final String password;
@@ -91,6 +94,21 @@ public class BoardPrincipal implements UserDetails, OAuth2User {
     @Override
     public int hashCode() {
         return Objects.hash(getUsername(), getPassword(), getEmail(), getNickname(), getMemo());
+    }
+
+    @Override
+    public Map<String, Object> getClaims() {
+        return null;
+    }
+
+    @Override
+    public OidcUserInfo getUserInfo() {
+        return null;
+    }
+
+    @Override
+    public OidcIdToken getIdToken() {
+        return null;
     }
 
     public enum RoleType {
