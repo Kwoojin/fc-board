@@ -33,6 +33,13 @@ public class CommonOAuth2Response {
                         .nickname(facebook.getName())
                         .build();
             }
+        },
+
+        naver {
+            public CommonOAuth2Response convert(Map<String, Object> attributes) {
+                return CommonOAuth2Response.builder()
+                        .build();
+            }
         }
         ;
 
