@@ -37,7 +37,12 @@ public class CommonOAuth2Response {
 
         naver {
             public CommonOAuth2Response convert(Map<String, Object> attributes) {
+                NaverOAuth2Response naver = NaverOAuth2Response.from(attributes);
+
                 return CommonOAuth2Response.builder()
+                        .id(naver.getId())
+                        .email(naver.getEmail())
+                        .nickname(naver.getResponse().getNickName())
                         .build();
             }
         }
