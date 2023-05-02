@@ -9,6 +9,7 @@ import java.util.Map;
 @Getter
 public class CommonOAuth2Response {
 
+    @SuppressWarnings("SpellCheckingInspection")
     public enum OAuth2Provider {
 
         kakao {
